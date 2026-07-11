@@ -11,7 +11,7 @@ const path = require('path');
 const app = (0, express_1.default)();
 const PORT = 5003;
 // Serve static assets from the React build directory
-const st = path.join(__dirname, "../", "../", 'distr', "client", "dist");
+const st = path.join(__dirname, "../", "../", 'distr', "client", "build");
 console.log("static: ", st);
 app.use(express_1.default.static(st));
 // Built-in middleware to parse incoming JSON request bodies

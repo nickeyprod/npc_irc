@@ -8,7 +8,7 @@ const app = express();
 const PORT = 5003;
 
 // Serve static assets from the React build directory
-const st = path.join(__dirname, "../", "../", 'distr', "client", "dist");
+const st = path.join(__dirname, "../", "../", 'distr', "client", "build");
 console.log("static: ", st)
 app.use(express.static(st));
 
