@@ -23,3 +23,5 @@ psql -U postgres -d postgres -f ./init-db.sql
 ```bash
 psql -U postgres -d npc_irc_db
 ```
+<br>
+После успешного запуска скрипта и инициализации БД, можно билдить проект и запускать сервер Node.js.
