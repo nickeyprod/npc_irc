@@ -21,6 +21,7 @@ import Card from "@mui/material/Card";
 // Argon Dashboard 2 MUI components
 import ArgonBox from "components/ArgonBox";
 import ArgonTypography from "components/ArgonTypography";
+import ArgonButton from "components/ArgonButton";
 
 // Argon Dashboard 2 MUI examples
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -76,7 +77,7 @@ function Tables() {
           
           <Card>
             <ArgonBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
-              <ArgonTypography variant="h6">1 таблица</ArgonTypography>
+              <ArgonTypography variant="h6">Вакансии</ArgonTypography>
             </ArgonBox>
             <AgGridProvider modules={modules}>
               {/* Your AgGridReact components go here */}
@@ -92,9 +93,22 @@ function Tables() {
           
           <ArgonBox>
             <Card style={{ marginTop: 20 }}>
+              
               <ArgonBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
-                <ArgonTypography variant="h6">2 таблица</ArgonTypography>
+                <ArgonTypography variant="h6">Кандидаты</ArgonTypography>
               </ArgonBox>
+              <div style={{display: "flex", marginBottom: 14, padding: '0 10px'}}>
+                <ArgonButton style={{marginRight: 10}} variant='contained' size='small' color="success" onClick={console.log("click")}>
+                  Добавить кандидата
+                </ArgonButton>
+                <ArgonButton style={{marginRight: 10,}} variant='outlined' size='small' color="info" onClick={console.log("click")}>
+                  Изменить
+                </ArgonButton>
+                <ArgonButton variant='outlined' size='small' color="error" onClick={console.log("click")}>
+                  Удалить
+                </ArgonButton>
+              </div>
+             
 
               <AgGridProvider modules={modules}>
                 <div style={{ height: "100%"}}>

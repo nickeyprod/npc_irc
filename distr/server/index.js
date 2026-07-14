@@ -1,29 +1,29 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
 // Main Server Initialization File
-const express_1 = __importDefault(require("express"));
-const main_routes_js_1 = __importDefault(require("./routes/main_routes.js"));
-const path = require('path');
+import express from "express";
+import path from "path";
+import { fileURLToPath } from 'url';
+// __filename and __dirname is not defined in ES module scope
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Importing routes
+import reactRoutes from "./routes/react_routes.js";
+import apiRoutes from "./routes/api_routes.js";
 // Initialize the Express application
-const app = (0, express_1.default)();
+const app = express();
 const PORT = 5003;
 // Serve static assets from the React build directory
-const st = path.join(__dirname, "../", "../", 'distr', "client", "build");
-console.log("static: ", st);
-app.use(express_1.default.static(st));
+app.use(express.static(path.join(__dirname, "../", "../", 'distr', "client", "build")));
 // Built-in middleware to parse incoming JSON request bodies
-app.use(express_1.default.json());
+app.use(express.json());
 // Use Routes from another directory
-app.use(main_routes_js_1.default);
+app.use("/api", apiRoutes);
+app.use(reactRoutes);
 // Custom middleware for logging requests
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} request to ${req.url}`);
     next(); // Pass control to the next handler
 });
-// 4. Catch-all middleware for 404 (Not Found) handling
+// Catch-all middleware for 404 (Not Found) handling
 app.use((req, res) => {
     res.status(404).send('Page Not Found');
 });

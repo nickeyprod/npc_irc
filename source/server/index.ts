@@ -1,23 +1,29 @@
 // Main Server Initialization File
 import express from "express";
-import mainRoutes from "./routes/main_routes.js";
-const path = require('path');
+import path from "path";
+import { fileURLToPath } from 'url';
+
+// __filename and __dirname is not defined in ES module scope
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename);
+
+// Importing routes
+import reactRoutes from "./routes/react_routes.js";
+import apiRoutes from "./routes/api_routes.js";
 
 // Initialize the Express application
 const app = express();
 const PORT = 5003;
 
 // Serve static assets from the React build directory
-const st = path.join(__dirname, "../", "../", 'distr', "client", "build");
-console.log("static: ", st)
-app.use(express.static(st));
+app.use(express.static(path.join(__dirname, "../", "../", 'distr', "client", "build")));
 
 // Built-in middleware to parse incoming JSON request bodies
 app.use(express.json());
 
-
 // Use Routes from another directory
-app.use(mainRoutes);
+app.use("/api", apiRoutes);
+app.use(reactRoutes);
 
 // Custom middleware for logging requests
 app.use((req, res, next) => {
@@ -25,7 +31,7 @@ app.use((req, res, next) => {
   next(); // Pass control to the next handler
 });
 
-// 4. Catch-all middleware for 404 (Not Found) handling
+// Catch-all middleware for 404 (Not Found) handling
 app.use((req, res) => {
   res.status(404).send('Page Not Found');
 });

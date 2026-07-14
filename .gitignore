@@ -284,3 +284,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Custom files
+local_env_vars.json
