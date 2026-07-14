@@ -7,7 +7,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // Importing routes
 import reactRoutes from "./routes/react_routes.js";
-import apiRoutes from "./routes/api_routes.js";
+import vacancyAPIRoutes from "./routes/API/vacancy_routes.js";
+import candidateAPIRoutes from "./routes/API/candidate_routes.js";
 // Initialize the Express application
 const app = express();
 const PORT = 5003;
@@ -16,7 +17,8 @@ app.use(express.static(path.join(__dirname, "../", "../", 'distr', "client", "bu
 // Built-in middleware to parse incoming JSON request bodies
 app.use(express.json());
 // Use Routes from another directory
-app.use("/api", apiRoutes);
+app.use("/api", vacancyAPIRoutes);
+app.use("/api", candidateAPIRoutes);
 app.use(reactRoutes);
 // Custom middleware for logging requests
 app.use((req, res, next) => {

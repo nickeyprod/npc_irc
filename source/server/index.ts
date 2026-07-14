@@ -9,7 +9,8 @@ const __dirname = path.dirname(__filename);
 
 // Importing routes
 import reactRoutes from "./routes/react_routes.js";
-import apiRoutes from "./routes/api_routes.js";
+import vacancyAPIRoutes from "./routes/API/vacancy_routes.js";
+import candidateAPIRoutes from "./routes/API/candidate_routes.js";
 
 // Initialize the Express application
 const app = express();
@@ -22,7 +23,8 @@ app.use(express.static(path.join(__dirname, "../", "../", 'distr', "client", "bu
 app.use(express.json());
 
 // Use Routes from another directory
-app.use("/api", apiRoutes);
+app.use("/api", vacancyAPIRoutes);
+app.use("/api", candidateAPIRoutes);
 app.use(reactRoutes);
 
 // Custom middleware for logging requests

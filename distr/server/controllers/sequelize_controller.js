@@ -15,9 +15,11 @@ class SequilizeController {
         this.connectionURI = connectionURI;
         // Initialize sequilize instance with provided URI
         this.sequelize = new Sequelize(this.connectionURI);
+        // Pass sequilize Types, Model, QueryTypes for convenience
         this.Types = Types;
         this.Model = Model;
         this.QueryTypes = QueryTypes;
+        // Define methods of sequilize on current class for convenience
         this.query = this.sequelize.query.bind(this.sequelize);
         this.define = this.sequelize.define.bind(this.sequelize);
     }
@@ -32,9 +34,6 @@ class SequilizeController {
             console.error('Unable to connect to the database:', error);
             return false;
         }
-    }
-    getVc() {
-        console.log("GET VC?!");
     }
 }
 // Если используется порт отличный от стандартного, или у вас установлен пароль, 
