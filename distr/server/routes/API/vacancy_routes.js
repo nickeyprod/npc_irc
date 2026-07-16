@@ -1,105 +1,78 @@
 // VACANCY API ROUTES
 import express from "express";
-import Vacancy from "../../models/Vacancy.js";
+import vc from "../../controllers/vacancies_controller.js";
+import RequestError from "../../custom_errors/request_error.js";
 const router = express.Router();
 // GET /api/vacancies - Returns all vacancies
 router.get('/vacancies', async (req, res) => {
     try {
-        // If from and to, then get part of vacancies
-        if (req.query.from && req.query.to) {
-            const partOfVacancies = await Vacancy.getPart(+req.query.from, +req.query.to);
-            // const partOfVacancies = await Vacancy.rawQuery("");
-            const stringifiedVacancies = JSON.stringify(partOfVacancies);
-            return res.send({ vacancies: stringifiedVacancies });
-        }
-        // Find all vacancies within RAW SQL QUERY
-        const vacancies = await Vacancy.getAll();
-        const stringifiedVacancies = JSON.stringify(vacancies);
+        // Process request in Vacancies Controller
+        const stringifiedVacancies = await vc.processVacanciesRequest(req);
         return res.send({ vacancies: stringifiedVacancies });
     }
     catch (err) {
+        if (err instanceof RequestError) {
+            return res.send({ error: err }).status(err.code);
+        }
         return res.send({ error: err }).status(500);
     }
 });
 // GET /api/vacancies/:id - Returns specific vacancy by passed ID
 router.get('/vacancies/:id', async (req, res) => {
     try {
-        if (!req.params.id) {
-            return res.status(400).json({ error: 'Missing required URL parameter "id"' });
-        }
-        const vacancyID = +req.params.id;
-        // Get specific vacancy by its ID within RAW SQL QUERY
-        const vacancy = await Vacancy.getByID(vacancyID);
-        if (vacancy.length == 0) {
-            return res.send({ candidate: "Vacancy with provided ID not found" });
-        }
-        const stringifiedVacancy = JSON.stringify(vacancy[0]);
+        // Process request in Vacancies Controller
+        const stringifiedVacancy = await vc.processVacanciesIdRequest(req);
         return res.send({ vacancy: stringifiedVacancy });
     }
     catch (err) {
+        if (err instanceof RequestError) {
+            return res.send({ error: err }).status(err.code);
+        }
         return res.send({ error: err }).status(500);
     }
 });
 // POST /api/vacancies/create - Create new vacancy with passed attributes
 router.post('/vacancies/create', async (req, res) => {
     try {
-        const { is_opened, name, salary } = req.body.data;
-        if (!is_opened) {
-            return res.status(400).json({ error: 'Missing required property "is_opened"' });
-        }
-        else if (!name) {
-            return res.status(400).json({ error: 'Missing required property "name"' });
-        }
-        else if (!salary) {
-            return res.status(400).json({ error: 'Missing required property "salary"' });
-        }
-        // Create new vacancy with passed attributes within RAW SQL QUERY
-        const newVacancy = await Vacancy.createNew(is_opened, name, salary, new Date());
-        const stringifiedNewVacancy = JSON.stringify(newVacancy);
+        // Process request in Vacancies Controller
+        const stringifiedNewVacancy = await vc.processVacanciesCreateRequest(req);
         return res.send({
             message: 'OK',
             newVacancy: stringifiedNewVacancy
         });
     }
     catch (err) {
+        if (err instanceof RequestError) {
+            return res.send({ error: err }).status(err.code);
+        }
         return res.send({ error: err }).status(500);
     }
 });
 // POST /api/vacancies/update - Update specific vacancy with passed id
 router.post('/vacancies/update', async (req, res) => {
     try {
-        const { id, is_opened, name, salary, opened_at, closed_at } = req.body.data;
-        if (!id) {
-            return res.status(400).json({ error: 'Missing required body parameter "ID"' });
-        }
-        // Update attributes of the vacancy within RAW SQL QUERY
-        const result = await Vacancy.updateSpecific(id, is_opened, name, salary, opened_at, closed_at);
-        const stringifiedResult = JSON.stringify(result);
-        return res.send({
-            message: 'OK',
-            newVacancy: stringifiedResult
-        });
+        // Process request in Vacancies Controller
+        const stringifiedResult = await vc.processVacanciesUpdateRequest(req);
+        return res.send({ message: 'OK', newVacancy: stringifiedResult });
     }
     catch (err) {
+        if (err instanceof RequestError) {
+            return res.send({ error: err }).status(err.code);
+        }
         return res.send({ error: err }).status(500);
     }
 });
 // POST /api/vacancies/remove - Remove specific vacancy by passed ID
 router.post('/vacancies/remove', async (req, res) => {
     try {
-        const { id } = req.body.data;
-        if (!id) {
-            return res.status(400).json({ error: 'Missing required body parameter "ID"' });
-        }
-        // Remove specific vacancy by passed ID within RAW SQL QUERY
-        const result = await Vacancy.removeByID(id);
-        const stringifiedResult = JSON.stringify(result);
-        return res.send({
-            message: 'REMOVED',
-            newVacancy: stringifiedResult
-        });
+        // Process request in Vacancies Controller
+        const stringifiedResult = await vc.processVacanciesRemoveRequest(req);
+        return res.send({ message: 'REMOVED', result: stringifiedResult });
     }
     catch (err) {
+        if (err instanceof RequestError) {
+            return res.send({ error: err }).status(err.code);
+        }
         return res.send({ error: err }).status(500);
     }
 });
