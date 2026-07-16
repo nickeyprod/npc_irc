@@ -7,6 +7,13 @@ const router = express.Router();
 // GET /api/vacancies - Returns all vacancies
 router.get('/vacancies', async (req, res) => {
     try {
+		// If from and to, then get part of vacancies
+		if (req.query.from && req.query.to) {
+			const partOfVacancies = await Vacancy.getPart(+req.query.from, +req.query.to);
+			// const partOfVacancies = await Vacancy.rawQuery("");
+			const stringifiedVacancies = JSON.stringify(partOfVacancies);
+			return res.send({ vacancies: stringifiedVacancies });
+		}
         // Find all vacancies within RAW SQL QUERY
         const vacancies = await Vacancy.getAll();
         const stringifiedVacancies = JSON.stringify(vacancies);

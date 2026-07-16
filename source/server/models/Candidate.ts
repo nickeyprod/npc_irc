@@ -1,5 +1,6 @@
 // Candidate Model
-import sq from "../controllers/sequelize_controller.js";
+import sq from "../controllers/sequelize/sequelize_controller.js";
+import MainModel from "../models/MainModel.js"
 
 // CREATE TABLE candidates (
 //     candidate_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -12,7 +13,7 @@ import sq from "../controllers/sequelize_controller.js";
 //     exp_in_full_years INTEGER
 // );
 
-class Candidate extends sq.Model {
+class Candidate extends MainModel {
 
     // Returns all candidates
     static async getAll()  {

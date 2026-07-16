@@ -13,7 +13,7 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState } from "react";
+import { useState, useMemo, useCallback,  } from "react";
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -34,60 +34,132 @@ import authorsTableData from "layouts/tables/data/authorsTableData";
 import projectsTableData from "layouts/tables/data/projectsTableData";
 
 // AG Grid
-import { AllCommunityModule } from 'ag-grid-community';
+import { AllCommunityModule, InfiniteRowModelModule } from 'ag-grid-community';
 import { AgGridProvider, AgGridReact } from 'ag-grid-react';
+import TableJobs from "assets/js/TableJobs.js"
+import { maxWidth } from "@mui/system";
 
 const modules = [AllCommunityModule];
 
+const tableJobs = new TableJobs();
+
 function Tables() {
-  const { columns, rows } = authorsTableData;
-  const { columns: prCols, rows: prRows } = projectsTableData;
+    const containerStyle = useMemo(() => ({ width: "100%", height: "150px" }), []);
 
-  // Row Data: The data to be displayed.
-    const [rowData, setRowData] = useState([
-      { make: "Tesla", model: "Model Y", price: 64950, electric: true },
+    const gridStyle = useMemo(() => ({ height: "150px", width: "100%" }), []);
 
-      { make: "Ford", model: "F-Series", price: 33850, electric: false },
+    const { columns, rows } = authorsTableData;
+    const { columns: prCols, rows: prRows } = projectsTableData;
 
-      { make: "Toyota", model: "Corolla", price: 29600, electric: false },
+    const defaultColDef = useMemo(() => {
+      return { flex: 1, minWidth: 100, sortable: false };
+    }, []);
 
-      { make: "Mercedes", model: "EQA", price: 48890, electric: true },
+    const onGridReady = useCallback((params) => {
 
-      { make: "Fiat", model: "500", price: 15774, electric: false },
+      const dataSource = {
+        rowCount: undefined,
+        getRows: (params) => {
 
-      { make: "Nissan", model: "Juke", price: 20675, electric: false },
+          console.log("asking for " + params.startRow + " to " + params.endRow);
+
+          // Get another part of vacancies!
+          tableJobs.getPartOfVacancies(params.startRow, params.endRow, (vacancies) => {
+            console.log(vacancies);
+            // if on or after the last page, work out the last row.
+            let lastRow = 8;
+            // call the success callback
+            params.successCallback(vacancies, lastRow);
+          });
+        }
+      };
+
+      // Data Source
+      params.api.setGridOption("datasource", dataSource);
+        
+    }, []);
+
+
+    // Row Data of Vacancies: The data to be displayed.
+    const [vacancyRowData, setVacancyRowData] = useState([
     ]);
 
     // Column Definitions: Defines the columns to be displayed.
-    const [colDefs, setColDefs] = useState([
-        { field: "make", flex: 1 },
-        { field: "model", flex: 1 },
-        { field: "price", flex: 1 },
-        { field: "electric", flex: 1 }
+    const [vacancyColDefs, setVacancyColDefs] = useState([
+        {
+          headerName: "ID",
+          flex: 0.2,
+          maxWidth: 50,
+          // it is important to have node.id here, so that when the id changes (which happens
+          // when the row is loaded) then the cell is refreshed.
+          valueGetter: "node.id",
+          cellRenderer: (props) => {
+            if (props.value !== undefined) {
+              return props.value;
+            } else {
+              return (
+                <img src="https://www.ag-grid.com/example-assets/loading.gif" />
+              );
+            }
+          }
+        },
+        { field: "vacancy_id", flex: 0.5 },
+        { field: "is_opened", flex: 1 },
+        { field: "name", flex: 1 },
+        { field: "salary", flex: 1 },
+        { field: "opened_at", flex: 1 },
+        { field: "closed_at", flex: 1 },
     ]);
 
+    // Row Data of Candidates: The data to be displayed.
+    const [candidatesRowData, setCandidatesRowData] = useState([
+      // { candidate_id: "Tesla", for_vacancy_id: "Model Y", first_name: 64950, last_name: true, surname: "surname", interview_date: "12", requested_salary: "33", exp_in_full_years: "1"},
+    ]);
+
+    // Column Definitions: Defines the columns to be displayed.
+    const [candidtesColDefs, setCandidatesColDefs] = useState([
+        { field: "candidate_id", flex: 0.5 },
+        { field: "for_vacancy_id", flex: 0.5 },
+        { field: "first_name", flex: 1 },
+        { field: "last_name", flex: 1 },
+        { field: "surname", flex: 1 },
+        { field: "interview_date", flex: 1},
+        { field: "requested_salary", flex: 1},
+        { field: "exp_in_full_years", flex: 0.5} 
+    ]);
+
+    // Set update methods
+    tableJobs.setRowsOfVacancies = setVacancyRowData;
+    tableJobs.setRowsOfCandidates = setCandidatesRowData;
+    
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <ArgonBox py={3}>
         
         <ArgonBox mb={3}>
-          
-
-          
           <Card>
             <ArgonBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
               <ArgonTypography variant="h6">Вакансии</ArgonTypography>
             </ArgonBox>
             <AgGridProvider modules={modules}>
-              {/* Your AgGridReact components go here */}
-              <div style={{ height: "100%"}}>
+              
+              <div style={containerStyle}>
+                <div style={gridStyle}>
                 <AgGridReact
-                    domLayout="autoHeight"
-                    rowData={rowData}
-                    columnDefs={colDefs}
+                    columnDefs={vacancyColDefs}
+                    defaultColDef={defaultColDef}
+                    rowBuffer={0}
+                    rowModelType={"infinite"}
+                    cacheBlockSize={3}
+                    cacheOverflowSize={1}
+                    maxConcurrentDatasourceRequests={1}
+                    infiniteInitialRowCount={1000}
+                    maxBlocksInCache={10}
+                    onGridReady={onGridReady}
                 />
             </div>
+          </div>
           </AgGridProvider>
           </Card>
           
@@ -98,13 +170,13 @@ function Tables() {
                 <ArgonTypography variant="h6">Кандидаты</ArgonTypography>
               </ArgonBox>
               <div style={{display: "flex", marginBottom: 14, padding: '0 10px'}}>
-                <ArgonButton style={{marginRight: 10}} variant='contained' size='small' color="success" onClick={console.log("click")}>
+                <ArgonButton style={{marginRight: 10}} variant='contained' size='small' color="success" onClick={() => { tableJobs.getCandidates(); }}>
                   Добавить кандидата
                 </ArgonButton>
-                <ArgonButton style={{marginRight: 10,}} variant='outlined' size='small' color="info" onClick={console.log("click")}>
+                <ArgonButton style={{marginRight: 10,}} variant='outlined' size='small' color="info" onClick={() => { tableJobs.getCandidates(); }}>
                   Изменить
                 </ArgonButton>
-                <ArgonButton variant='outlined' size='small' color="error" onClick={console.log("click")}>
+                <ArgonButton variant='outlined' size='small' color="error" onClick={ () => { tableJobs.getCandidates(); }}>
                   Удалить
                 </ArgonButton>
               </div>
@@ -114,8 +186,8 @@ function Tables() {
                 <div style={{ height: "100%"}}>
                   <AgGridReact
                       domLayout="autoHeight"
-                      rowData={rowData}
-                      columnDefs={colDefs}
+                      rowData={candidatesRowData}
+                      columnDefs={candidtesColDefs}
                   />
                 </div>
               </AgGridProvider>

@@ -1,5 +1,6 @@
 // Vacancy Model
-import sq from "../controllers/sequelize_controller.js";
+import sq from "../controllers/sequelize/sequelize_controller.js";
+import MainModel from "../models/MainModel.js"
 
 // CREATE TABLE vacancies (
 //     vacancy_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -10,7 +11,7 @@ import sq from "../controllers/sequelize_controller.js";
 //     closed_at DATE
 // );
 
-class Vacancy extends sq.Model {
+class Vacancy extends MainModel {
 
     // Returns all vacancies
     static async getAll()  {
@@ -26,6 +27,19 @@ class Vacancy extends sq.Model {
             type: sq.QueryTypes.SELECT 
         });
         return vacancy;
+    }
+
+    // Get vacancies by limit & offest
+    static async getPart(from: number, to: number)  {
+        const vacancies = await sq.query(
+            `SELECT * FROM vacancies 
+            INNER JOIN candidates  
+            ON candidates.for_vacancy_id = vacancy.id 
+            ORDER BY vacancy_id 
+            LIMIT ${to} OFFSET ${from}`, { 
+                type: sq.QueryTypes.SELECT 
+        });
+        return vacancies;
     }
 
     // Create new vacancy with passed attributes
