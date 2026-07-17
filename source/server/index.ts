@@ -21,6 +21,7 @@ app.use(express.static(path.join(__dirname, "../", "../", 'distr', "client", "bu
 
 // Built-in middleware to parse incoming JSON request bodies
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
 
 // Use Routes from another directory
 app.use("/api", vacancyAPIRoutes);

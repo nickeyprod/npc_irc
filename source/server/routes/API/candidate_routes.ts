@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/candidates', async (req, res) => {
     try {
         // Process request in Candidates Controller
-		const stringifiedCandidates = cc.processCandidatesRequest(req);
+		const stringifiedCandidates = await cc.processCandidatesRequest(req);
         return res.send({ candidates: stringifiedCandidates });
     } 
     catch(err) {
@@ -44,8 +44,8 @@ router.get('/candidates/:id', async (req, res) => {
 router.post('/candidates/create', async (req, res) => {
 	try {
 		// Process request in Candidates Controller
-		const stringifiedNewCandidate = cc.processCandidatesCreateRequest(req);
-		return res.send({ message: 'OK', newCandidate: stringifiedNewCandidate });
+		const numOfInsertedRows = await cc.processCandidatesCreateRequest(req);
+		return res.send({ message: 'OK', newCandidate: numOfInsertedRows });		
 	}
 	catch(err) {
 		if (err instanceof RequestError) {
@@ -76,8 +76,8 @@ router.post('/candidates/update', async (req, res) => {
 router.post('/candidates/remove', async (req, res) => {
 	try {
 		// Process request in Candidates Controller
-		const stringifiedResult = await cc.processCandidatesRemoveRequest(req);
-		return res.send({ message: 'REMOVED', result: stringifiedResult });
+		const results = await cc.processCandidatesRemoveRequest(req);
+		return res.send({ message: 'OK', result: results });
 	}
 	catch(err) {
 		if (err instanceof RequestError) {

@@ -5,7 +5,7 @@ class MainModel extends sq.Model {
 
     // Perform any RAW provided query
     static async rawQuery(queryString: string) {
-        const results = await sq.query(queryString);
+        const [results, meta ] = await sq.query(queryString);
         return results;
     }
     

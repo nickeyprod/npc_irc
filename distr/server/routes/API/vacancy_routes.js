@@ -36,6 +36,7 @@ router.post('/vacancies/create', async (req, res) => {
     try {
         // Process request in Vacancies Controller
         const stringifiedNewVacancy = await vc.processVacanciesCreateRequest(req);
+        // console.log("Created: ", stringifiedNewVacancy);
         return res.send({
             message: 'OK',
             newVacancy: stringifiedNewVacancy

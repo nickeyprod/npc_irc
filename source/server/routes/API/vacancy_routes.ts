@@ -10,7 +10,7 @@ router.get('/vacancies', async (req, res) => {
 		// Process request in Vacancies Controller
 		const stringifiedVacancies = await vc.processVacanciesRequest(req);
         return res.send({ vacancies: stringifiedVacancies });
-    } 
+    }
     catch (err) {
         if (err instanceof RequestError) {
 			return res.send({error: err}).status(err.code); 
@@ -39,6 +39,7 @@ router.post('/vacancies/create', async (req, res) => {
 	try {
 		// Process request in Vacancies Controller
 		const stringifiedNewVacancy = await vc.processVacanciesCreateRequest(req);
+		// console.log("Created: ", stringifiedNewVacancy);
 		return res.send({
 			message: 'OK',
 			newVacancy: stringifiedNewVacancy

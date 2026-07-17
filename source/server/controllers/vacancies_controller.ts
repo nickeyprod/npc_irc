@@ -7,6 +7,20 @@ class VacanciesController {
 
     // Process request to GET /api/vacancies 
     async processVacanciesRequest(req: Request) {
+        // If cd_count param, then get part of vacancies and join count of candidates
+        if (req.query.cd_count && req.query.from && req.query.to) {
+            
+            const partOfVacancies = await Vacancy.rawQuery(`
+                SELECT v.vacancy_id, v.is_opened, v.name, v.salary, v.opened_at, v.closed_at, COUNT(c.candidate_id) AS total_candidates
+                FROM vacancies v
+                LEFT JOIN candidates c ON
+                v.vacancy_id = c.for_vacancy_id
+                GROUP BY v.vacancy_id, v.name
+                LIMIT ${req.query.to} OFFSET ${req.query.from};
+                `);
+			const stringifiedVacancies = JSON.stringify(partOfVacancies);
+			return stringifiedVacancies
+        }
 
         // If from and to, then get part of vacancies
 		if (req.query.from && req.query.to) {

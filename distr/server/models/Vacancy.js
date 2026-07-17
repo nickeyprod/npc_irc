@@ -27,8 +27,6 @@ class Vacancy extends MainModel {
     // Get vacancies by limit & offest
     static async getPart(from, to) {
         const vacancies = await sq.query(`SELECT * FROM vacancies 
-            INNER JOIN candidates  
-            ON candidates.for_vacancy_id = vacancy.id 
             ORDER BY vacancy_id 
             LIMIT ${to} OFFSET ${from}`, {
             type: sq.QueryTypes.SELECT

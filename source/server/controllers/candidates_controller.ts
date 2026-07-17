@@ -29,9 +29,8 @@ class VacanciesController {
     }
 
     // Process request to POST /api/candidates/create
-    async processCandidatesCreateRequest(req: Request) {
-
-        const { for_vacancy_id, first_name, last_name, surname, interview_date, requested_salary, exp_in_full_years } = req.body.data;
+    async processCandidatesCreateRequest(req: Request) {    
+        const { first_name, last_name, surname, for_vacancy_id,  interview_date, requested_salary, exp_in_full_years } = req.body;
 		
 		if (!for_vacancy_id) {
             throw new RequestError(400, 'Missing required property "for_vacancy_id"');
@@ -56,10 +55,9 @@ class VacanciesController {
 		}
 
 		// Create new candidate with passed attributes within RAW SQL QUERY
-		const newCandidate = await Candidate.createNew(for_vacancy_id, first_name, last_name, surname, interview_date, requested_salary, exp_in_full_years);
-
-		const stringifiedNewCandidate = JSON.stringify(newCandidate);
-        return stringifiedNewCandidate;
+		const numOfInsertedRows = await Candidate.createNew(for_vacancy_id, first_name, last_name, surname, interview_date, requested_salary, exp_in_full_years);
+        
+        return numOfInsertedRows;
     }
 
     // Process request to POST /api/candidates/update
@@ -80,17 +78,15 @@ class VacanciesController {
 
     // Process request to POST /api/candidates/remove
     async processCandidatesRemoveRequest(req: Request) {
-        const { id } = req.body.data;
+        const { id } = req.body;
 		
 		if (!id) {
 			throw new RequestError(400, 'Missing required body parameter "ID"');
 		}
 
 		// Remove specific candidate by passed ID within RAW SQL QUERY
-		const result = await Candidate.removeByID(id);
-
-		const stringifiedResult = JSON.stringify(result);
-        return stringifiedResult;
+		const results = await Candidate.removeByID(id);
+        return results;
     }
 }
 

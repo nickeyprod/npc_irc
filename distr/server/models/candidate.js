@@ -28,7 +28,7 @@ class Candidate extends MainModel {
     }
     // Create new candidate with passed attributes
     static async createNew(for_vacancy_id, first_name, last_name, surname, interview_date, requested_salary, exp_in_full_years) {
-        const newCandidate = await sq.query(`INSERT INTO candidates (
+        const [results, meta] = await sq.query(`INSERT INTO candidates (
                 for_vacancy_id, 
                 first_name, 
                 last_name, 
@@ -38,17 +38,17 @@ class Candidate extends MainModel {
                 exp_in_full_years
             ) 
             VALUES (
-                ${for_vacancy_id}, 
-                ${first_name}, 
-                ${last_name}, 
-                ${surname}, 
-                ${interview_date}, 
+                '${for_vacancy_id}', 
+                '${first_name}', 
+                '${last_name}', 
+                '${surname}', 
+                '${interview_date}', 
                 ${requested_salary}, 
                 ${exp_in_full_years}
-            )`, {
-            type: sq.QueryTypes.INSERT
+            );`, {
+            type: sq.QueryTypes.INSERT,
         });
-        return newCandidate;
+        return meta;
     }
     // Update attributes of the candidate
     static async updateSpecific(id, for_vacancy_id, first_name, last_name, surname, interview_date, requested_salary, exp_in_full_years) {
@@ -83,10 +83,10 @@ class Candidate extends MainModel {
     }
     // Remove specific candidate by passed ID
     static async removeByID(id) {
-        const vacancy = await sq.query(`DELETE FROM candidates WHERE candidate_id = '${id}'`, {
+        const results = await sq.query(`DELETE FROM candidates WHERE candidate_id = '${id}'`, {
             type: sq.QueryTypes.DELETE
         });
-        return vacancy;
+        return results;
     }
 }
 Candidate.init({

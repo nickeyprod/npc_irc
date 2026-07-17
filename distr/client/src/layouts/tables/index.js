@@ -13,7 +13,7 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState, useMemo, useCallback,  } from "react";
+import { useState, useMemo, useCallback, useEffect  } from "react";
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -22,6 +22,7 @@ import Card from "@mui/material/Card";
 import ArgonBox from "components/ArgonBox";
 import ArgonTypography from "components/ArgonTypography";
 import ArgonButton from "components/ArgonButton";
+import ArgonInput from "components/ArgonInput";
 
 // Argon Dashboard 2 MUI examples
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -37,7 +38,8 @@ import projectsTableData from "layouts/tables/data/projectsTableData";
 import { AllCommunityModule, InfiniteRowModelModule } from 'ag-grid-community';
 import { AgGridProvider, AgGridReact } from 'ag-grid-react';
 import TableJobs from "assets/js/TableJobs.js"
-import { maxWidth } from "@mui/system";
+import { display, height, maxHeight, maxWidth, spacing, textAlign } from "@mui/system";
+import { position } from "stylis";
 
 const modules = [AllCommunityModule];
 
@@ -55,6 +57,8 @@ function Tables() {
       return { flex: 1, minWidth: 100, sortable: false };
     }, []);
 
+    let purgeCacheOfVacancyTable;
+
     const onGridReady = useCallback((params) => {
 
       const dataSource = {
@@ -65,7 +69,6 @@ function Tables() {
 
           // Get another part of vacancies!
           tableJobs.getPartOfVacancies(params.startRow, params.endRow, (vacancies) => {
-            console.log(vacancies);
             // if on or after the last page, work out the last row.
             let lastRow = 8;
             // call the success callback
@@ -76,6 +79,7 @@ function Tables() {
 
       // Data Source
       params.api.setGridOption("datasource", dataSource);
+      tableJobs.purgeCacheOfVacancyTable = params.api.purgeInfiniteCache;
         
     }, []);
 
@@ -107,13 +111,13 @@ function Tables() {
         { field: "is_opened", flex: 1 },
         { field: "name", flex: 1 },
         { field: "salary", flex: 1 },
+        { field: "total_candidates", flex: 1},
         { field: "opened_at", flex: 1 },
-        { field: "closed_at", flex: 1 },
+        { field: "closed_at", flex: 0.5 },
     ]);
 
     // Row Data of Candidates: The data to be displayed.
     const [candidatesRowData, setCandidatesRowData] = useState([
-      // { candidate_id: "Tesla", for_vacancy_id: "Model Y", first_name: 64950, last_name: true, surname: "surname", interview_date: "12", requested_salary: "33", exp_in_full_years: "1"},
     ]);
 
     // Column Definitions: Defines the columns to be displayed.
@@ -132,10 +136,41 @@ function Tables() {
     tableJobs.setRowsOfVacancies = setVacancyRowData;
     tableJobs.setRowsOfCandidates = setCandidatesRowData;
     
+    useEffect(() => {
+
+      // Get all attributes of Candidate from modal
+      const candidateNameInpt = document.getElementById("modal-name-inpt");
+      const candidateLastNameInpt = document.getElementById("modal-lastname-inpt");
+      const candidateSurameInpt = document.getElementById("modal-surname-inpt");
+      const candidatevIDInpt = document.getElementById("modal-vID-inpt");
+      const candidateExpInpt = document.getElementById("modal-exp-inpt");
+      const candidateSalaryInpt = document.getElementById("modal-salary-inpt");
+      const candidateInterviewDateInpt = document.getElementById("modal-date-inpt");
+      const candidteToRemoveIdInpt = document.getElementById("modal-rm-vID-inpt");
+      
+
+      //  Add new candidate fields
+      tableJobs.candidateNameInpt = candidateNameInpt;
+      tableJobs.candidateLastNameInpt = candidateLastNameInpt;
+      tableJobs.candidateSurameInpt = candidateSurameInpt;
+      tableJobs.candidatevIDInpt = candidatevIDInpt;
+      tableJobs.candidateExpInpt = candidateExpInpt;
+      tableJobs.candidateSalaryInpt = candidateSalaryInpt;
+      tableJobs.candidateInterviewDateInpt = candidateInterviewDateInpt;
+      
+      // Remove candidate ID field
+      tableJobs.candidteToRemoveIdInpt = candidteToRemoveIdInpt;
+
+    }, []);
+    
   return (
+    <div style={{position: "relative"}}>
     <DashboardLayout>
+      
       <DashboardNavbar />
+      
       <ArgonBox py={3}>
+        
         
         <ArgonBox mb={3}>
           <Card>
@@ -170,13 +205,13 @@ function Tables() {
                 <ArgonTypography variant="h6">Кандидаты</ArgonTypography>
               </ArgonBox>
               <div style={{display: "flex", marginBottom: 14, padding: '0 10px'}}>
-                <ArgonButton style={{marginRight: 10}} variant='contained' size='small' color="success" onClick={() => { tableJobs.getCandidates(); }}>
+                <ArgonButton style={{marginRight: 10}} variant='contained' size='small' color="success" onClick={tableJobs.addCandidate}>
                   Добавить кандидата
                 </ArgonButton>
-                <ArgonButton style={{marginRight: 10,}} variant='outlined' size='small' color="info" onClick={() => { tableJobs.getCandidates(); }}>
+                <ArgonButton style={{marginRight: 10,}} variant='outlined' size='small' color="info" onClick={ tableJobs.updateCandidate}>
                   Изменить
                 </ArgonButton>
-                <ArgonButton variant='outlined' size='small' color="error" onClick={ () => { tableJobs.getCandidates(); }}>
+                <ArgonButton variant='outlined' size='small' color="error" onClick={ tableJobs.removeCandidate }>
                   Удалить
                 </ArgonButton>
               </div>
@@ -216,7 +251,39 @@ function Tables() {
         </Card>
       </ArgonBox>
       <Footer />
+      
     </DashboardLayout>
+    <div class="modal-overlay" id="modal-overlay" style={ {marginTop: "100px", background: "bisque", position: "absolute", height: "100%", width: "100%", "z-index": 2}}>
+        {/* Add cancicate modal */}
+        <div class="modal" id="add-candidate-modal" style={{maxWidth: "400px"}}>
+          <h5 style={{textAlign: "center", marginTop: "20px"}}>Добавить кандидата</h5>
+          <div style={{display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "380px", padding: "20px 40px"}}>
+          <ArgonInput id="modal-name-inpt" placeholder="Имя"></ArgonInput>
+          <ArgonInput id="modal-lastname-inpt" placeholder="Фамилия"></ArgonInput>
+          <ArgonInput id="modal-surname-inpt" placeholder="Отчество"></ArgonInput>
+          <ArgonInput id="modal-vID-inpt" type="number" placeholder="ID вакансии"></ArgonInput>
+          <ArgonInput id="modal-exp-inpt" type="number" min="0" placeholder="Опыт (полных лет)"></ArgonInput>
+          <ArgonInput id="modal-salary-inpt" type="number" step="0.01" min="0" placeholder="Желаемая З/П"></ArgonInput>
+          <ArgonInput id="modal-date-inpt" type="date" placeholder="Дата собеседования"></ArgonInput>
+          </div>
+          <div style={{display: "flex", justifyContent: "center", marginTop: "10px"}}>
+            <ArgonButton variant='contained' size='small' color="success" onClick={ () => { tableJobs.createNewCandidate(); } }>Отправить</ArgonButton>
+          </div>
+        </div>
+        {/* Remove candidate modal */}
+        <div class="modal" id="remove-candidate-modal" style={{maxWidth: "400px", backgroundColor: "grey"}}>
+          <h5 style={{textAlign: "center", marginTop: "20px"}}>Удалить кандидата</h5>
+          <div style={{display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "80px", padding: "20px 40px"}}>
+            <ArgonInput id="modal-rm-vID-inpt" type="number" placeholder="ID удаляемого кандидата"></ArgonInput>
+          </div>
+          <div style={{display: "flex", justifyContent: "center", marginTop: "10px"}}>
+            <ArgonButton variant='contained' size='small' color="success" onClick={ () => { tableJobs.removeCandidate(); } }>Удалить</ArgonButton>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    
   );
 }
 
