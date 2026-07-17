@@ -1,6 +1,10 @@
 import Network from "./Network";
 
 class TableJobs extends Network {
+
+    addCandidateModal
+    updateCandidateModal
+    removeCandidateModal
     
     setRowsOfCandidates;
     setRowsOfVacancies;

@@ -40,6 +40,7 @@ import { AgGridProvider, AgGridReact } from 'ag-grid-react';
 import TableJobs from "assets/js/TableJobs.js"
 import { display, height, maxHeight, maxWidth, spacing, textAlign } from "@mui/system";
 import { position } from "stylis";
+import zIndex from "@mui/material/styles/zIndex";
 
 const modules = [AllCommunityModule];
 
@@ -137,6 +138,10 @@ function Tables() {
     tableJobs.setRowsOfCandidates = setCandidatesRowData;
     
     useEffect(() => {
+      // Get modals
+      const addCandidateModal = document.getElementById("add-candidate-modal");
+      const updateCandidateModal = document.getElementById("upd-candidate-modal");
+      const removeCandidateModal = document.getElementById("remove-candidate-modal");
 
       // Get all attributes of Candidate from modal
       const candidateNameInpt = document.getElementById("modal-name-inpt");
@@ -148,8 +153,15 @@ function Tables() {
       const candidateInterviewDateInpt = document.getElementById("modal-date-inpt");
       const candidteToRemoveIdInpt = document.getElementById("modal-rm-vID-inpt");
       
+      // Add candidate modal
+      tableJobs.addCandidateModal = addCandidateModal;
+      // Update candidate modal
+      tableJobs.updateCandidateModal = updateCandidateModal;
+      // Remove candidate modal
+      tableJobs.removeCandidateModal = removeCandidateModal;
+      
 
-      //  Add new candidate fields
+      // Add new candidate fields
       tableJobs.candidateNameInpt = candidateNameInpt;
       tableJobs.candidateLastNameInpt = candidateLastNameInpt;
       tableJobs.candidateSurameInpt = candidateSurameInpt;
@@ -160,18 +172,62 @@ function Tables() {
       
       // Remove candidate ID field
       tableJobs.candidteToRemoveIdInpt = candidteToRemoveIdInpt;
-
+    
     }, []);
     
   return (
-    <div style={{position: "relative"}}>
+    
     <DashboardLayout>
-      
+       <div class="modal-overlay" id="modal-overlay" style={{top: "140px", width: "400px", marginLeft: "26%", position: "fixed", zIndex: 9999}}>
+        {/* Add candicate modal */}
+        <div class="modal" id="add-candidate-modal" style={{ display: "none", maxWidth: "450px", padding: "20px", background: "#4cb4c7"}}>
+          <h4 style={{textAlign: "center", color: "white", marginTop: "20px"}}>Добавить кандидата</h4>
+          <div style={{display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "380px", padding: "20px 40px"}}>
+          <ArgonInput id="modal-name-inpt" placeholder="Имя"></ArgonInput>
+          <ArgonInput id="modal-lastname-inpt" placeholder="Фамилия"></ArgonInput>
+          <ArgonInput id="modal-surname-inpt" placeholder="Отчество"></ArgonInput>
+          <ArgonInput id="modal-vID-inpt" type="number" placeholder="ID вакансии (к какой вакансии)"></ArgonInput>
+          <ArgonInput id="modal-exp-inpt" type="number" min="0" placeholder="Опыт (полных лет)"></ArgonInput>
+          <ArgonInput id="modal-salary-inpt" type="number" step="0.01" min="0" placeholder="Желаемая З/П"></ArgonInput>
+          <ArgonInput id="modal-date-inpt" type="date" placeholder="Дата собеседования"></ArgonInput>
+          </div>
+          <div style={{display: "flex", justifyContent: "center", marginTop: "10px"}}>
+            <ArgonButton variant='contained' size='small' color="success" onClick={ () => {console.log("Add!");} }>Добавить</ArgonButton>
+            <ArgonButton style={{marginLeft: "10px"}} variant='contained' size='small' color="error" onClick={ () => { tableJobs.addCandidateModal.style.display = "none"; } }>Отмена</ArgonButton>
+          </div>
+        </div>
+        {/* Update candidate modal */}
+        <div class="modal" id="upd-candidate-modal" style={{ display: "none", maxWidth: "450px", padding: "20px", background: "rgb(115 153 160)"}}>
+          <h5 style={{textAlign: "center", marginTop: "20px", color: "white"}}>Изменить кандидата</h5>
+          <div style={{display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "380px", padding: "20px 40px"}}>
+          <ArgonInput id="modal-cdID-inpt" type="number" placeholder="ID изменяемого кандидата"></ArgonInput>
+          <ArgonInput id="modal-name-inpt" placeholder="Имя"></ArgonInput>
+          <ArgonInput id="modal-lastname-inpt" placeholder="Фамилия"></ArgonInput>
+          <ArgonInput id="modal-surname-inpt" placeholder="Отчество"></ArgonInput>
+          <ArgonInput id="modal-vID-inpt" type="number" placeholder="ID вакансии (к какой вакансии)"></ArgonInput>
+          <ArgonInput id="modal-exp-inpt" type="number" min="0" placeholder="Опыт (полных лет)"></ArgonInput>
+          <ArgonInput id="modal-salary-inpt" type="number" step="0.01" min="0" placeholder="Желаемая З/П"></ArgonInput>
+          <ArgonInput id="modal-date-inpt" type="date" placeholder="Дата собеседования"></ArgonInput>
+          </div>
+          <div style={{display: "flex", justifyContent: "center", marginTop: "10px"}}>
+            <ArgonButton variant='contained' size='small' color="success" onClick={ () => { tableJobs.updateCandidate(); } }>Изменить</ArgonButton>
+            <ArgonButton style={{marginLeft: "10px"}} variant='contained' size='small' color="error" onClick={ () => { tableJobs.updateCandidateModal.style.display = "none"; } }>Отмена</ArgonButton>
+          </div>
+        </div>
+        {/* Remove candidate modal */}
+        <div class="modal" id="remove-candidate-modal" style={{ display: "block", maxWidth: "450px", padding: "20px", background: "rgb(155 77 98)"}}>
+          <h5 style={{textAlign: "center", marginTop: "20px", color: "white"}}>Удалить кандидата</h5>
+          <div style={{display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "80px", padding: "20px 40px"}}>
+            <ArgonInput id="modal-rm-vID-inpt" type="number" placeholder="ID удаляемого кандидата"></ArgonInput>
+          </div>
+          <div style={{display: "flex", justifyContent: "center", marginTop: "10px"}}>
+            <ArgonButton variant='contained' size='small' color="success" onClick={ () => { tableJobs.removeCandidate(); } }>Удалить</ArgonButton>
+            <ArgonButton style={{marginLeft: "10px"}} variant='contained' size='small' color="error" onClick={ () => { tableJobs.removeCandidateModal.style.display = "none"; } }>Отмена</ArgonButton>
+          </div>
+        </div>
+      </div>
       <DashboardNavbar />
-      
       <ArgonBox py={3}>
-        
-        
         <ArgonBox mb={3}>
           <Card>
             <ArgonBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
@@ -197,6 +253,7 @@ function Tables() {
           </div>
           </AgGridProvider>
           </Card>
+       
           
           <ArgonBox>
             <Card style={{ marginTop: 20 }}>
@@ -205,13 +262,13 @@ function Tables() {
                 <ArgonTypography variant="h6">Кандидаты</ArgonTypography>
               </ArgonBox>
               <div style={{display: "flex", marginBottom: 14, padding: '0 10px'}}>
-                <ArgonButton style={{marginRight: 10}} variant='contained' size='small' color="success" onClick={tableJobs.addCandidate}>
+                <ArgonButton style={{marginRight: 10}} variant='contained' size='small' color="success" onClick={ () => { tableJobs.addCandidateModal.style.display = "block"; } }>
                   Добавить кандидата
                 </ArgonButton>
-                <ArgonButton style={{marginRight: 10,}} variant='outlined' size='small' color="info" onClick={ tableJobs.updateCandidate}>
+                <ArgonButton style={{marginRight: 10,}} variant='outlined' size='small' color="info" onClick={ () => { tableJobs.updateCandidateModal.style.display = "block"; }}>
                   Изменить
                 </ArgonButton>
-                <ArgonButton variant='outlined' size='small' color="error" onClick={ tableJobs.removeCandidate }>
+                <ArgonButton variant='outlined' size='small' color="error" onClick={ () => { tableJobs.removeCandidateModal.style.display = "block"; } }>
                   Удалить
                 </ArgonButton>
               </div>
@@ -252,38 +309,8 @@ function Tables() {
       </ArgonBox>
       <Footer />
       
-    </DashboardLayout>
-    <div class="modal-overlay" id="modal-overlay" style={ {marginTop: "100px", background: "bisque", position: "absolute", height: "100%", width: "100%", "z-index": 2}}>
-        {/* Add cancicate modal */}
-        <div class="modal" id="add-candidate-modal" style={{maxWidth: "400px"}}>
-          <h5 style={{textAlign: "center", marginTop: "20px"}}>Добавить кандидата</h5>
-          <div style={{display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "380px", padding: "20px 40px"}}>
-          <ArgonInput id="modal-name-inpt" placeholder="Имя"></ArgonInput>
-          <ArgonInput id="modal-lastname-inpt" placeholder="Фамилия"></ArgonInput>
-          <ArgonInput id="modal-surname-inpt" placeholder="Отчество"></ArgonInput>
-          <ArgonInput id="modal-vID-inpt" type="number" placeholder="ID вакансии"></ArgonInput>
-          <ArgonInput id="modal-exp-inpt" type="number" min="0" placeholder="Опыт (полных лет)"></ArgonInput>
-          <ArgonInput id="modal-salary-inpt" type="number" step="0.01" min="0" placeholder="Желаемая З/П"></ArgonInput>
-          <ArgonInput id="modal-date-inpt" type="date" placeholder="Дата собеседования"></ArgonInput>
-          </div>
-          <div style={{display: "flex", justifyContent: "center", marginTop: "10px"}}>
-            <ArgonButton variant='contained' size='small' color="success" onClick={ () => { tableJobs.createNewCandidate(); } }>Отправить</ArgonButton>
-          </div>
-        </div>
-        {/* Remove candidate modal */}
-        <div class="modal" id="remove-candidate-modal" style={{maxWidth: "400px", backgroundColor: "grey"}}>
-          <h5 style={{textAlign: "center", marginTop: "20px"}}>Удалить кандидата</h5>
-          <div style={{display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "80px", padding: "20px 40px"}}>
-            <ArgonInput id="modal-rm-vID-inpt" type="number" placeholder="ID удаляемого кандидата"></ArgonInput>
-          </div>
-          <div style={{display: "flex", justifyContent: "center", marginTop: "10px"}}>
-            <ArgonButton variant='contained' size='small' color="success" onClick={ () => { tableJobs.removeCandidate(); } }>Удалить</ArgonButton>
-          </div>
-        </div>
-      </div>
-
-    </div>
-    
+      
+    </DashboardLayout>    
   );
 }
 
