@@ -38,7 +38,7 @@ import projectsTableData from "layouts/tables/data/projectsTableData";
 import { AllCommunityModule, InfiniteRowModelModule } from 'ag-grid-community';
 import { AgGridProvider, AgGridReact } from 'ag-grid-react';
 import TableJobs from "assets/js/TableJobs.js"
-import { display, height, maxHeight, maxWidth, spacing, textAlign } from "@mui/system";
+import { borderRadius, display, height, maxHeight, maxWidth, spacing, textAlign } from "@mui/system";
 import { position } from "stylis";
 import zIndex from "@mui/material/styles/zIndex";
 
@@ -180,7 +180,7 @@ function Tables() {
     <DashboardLayout>
        <div class="modal-overlay" id="modal-overlay" style={{top: "140px", width: "400px", marginLeft: "26%", position: "fixed", zIndex: 9999}}>
         {/* Add candicate modal */}
-        <div class="modal" id="add-candidate-modal" style={{ display: "none", maxWidth: "450px", padding: "20px", background: "#4cb4c7"}}>
+        <div class="modal" id="add-candidate-modal" style={{ display: "none", maxWidth: "450px", padding: "20px", background: "#4cb4c7", borderRadius: "20px"}}>
           <h4 style={{textAlign: "center", color: "white", marginTop: "20px"}}>Добавить кандидата</h4>
           <div style={{display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "380px", padding: "20px 40px"}}>
           <ArgonInput id="modal-name-inpt" placeholder="Имя"></ArgonInput>
@@ -197,7 +197,7 @@ function Tables() {
           </div>
         </div>
         {/* Update candidate modal */}
-        <div class="modal" id="upd-candidate-modal" style={{ display: "none", maxWidth: "450px", padding: "20px", background: "rgb(115 153 160)"}}>
+        <div class="modal" id="upd-candidate-modal" style={{ display: "none", maxWidth: "450px", padding: "20px", background: "rgb(115 153 160)", borderRadius: "20px"}}>
           <h5 style={{textAlign: "center", marginTop: "20px", color: "white"}}>Изменить кандидата</h5>
           <div style={{display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "380px", padding: "20px 40px"}}>
           <ArgonInput id="modal-cdID-inpt" type="number" placeholder="ID изменяемого кандидата"></ArgonInput>
@@ -215,7 +215,7 @@ function Tables() {
           </div>
         </div>
         {/* Remove candidate modal */}
-        <div class="modal" id="remove-candidate-modal" style={{ display: "block", maxWidth: "450px", padding: "20px", background: "rgb(155 77 98)"}}>
+        <div class="modal" id="remove-candidate-modal" style={{ display: "none", maxWidth: "450px", padding: "20px", background: "rgb(155 77 98)", borderRadius: "20px"}}>
           <h5 style={{textAlign: "center", marginTop: "20px", color: "white"}}>Удалить кандидата</h5>
           <div style={{display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "80px", padding: "20px 40px"}}>
             <ArgonInput id="modal-rm-vID-inpt" type="number" placeholder="ID удаляемого кандидата"></ArgonInput>
