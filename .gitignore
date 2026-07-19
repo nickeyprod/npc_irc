@@ -286,4 +286,4 @@ vite.config.ts.timestamp-*
 .vite/
 
 # Custom files
-local_env_vars.json
+# local_env_vars.json
