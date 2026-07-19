@@ -17,7 +17,7 @@ class Candidate extends MainModel {
 
     // Returns all candidates
     static async getAll()  {
-        const candidates = await sq.query("SELECT * FROM candidates", {
+        const candidates = await sq.query("SELECT * FROM candidates ORDER BY candidate_id", {
             type: sq.QueryTypes.SELECT
         });
         return candidates;
@@ -60,23 +60,23 @@ class Candidate extends MainModel {
     }
 
     // Update attributes of the candidate
-    static async updateSpecific(id: number, for_vacancy_id: number | undefined, first_name: string | undefined, last_name: string | undefined, surname: string | undefined, interview_date: Date | undefined, requested_salary: number | undefined, exp_in_full_years: number | undefined) {
+    static async updateSpecific(candidate_id: number, for_vacancy_id: number | undefined, first_name: string | undefined, last_name: string | undefined, surname: string | undefined, interview_date: Date | undefined, requested_salary: number | undefined, exp_in_full_years: number | undefined) {
         const updationParts = [];
 
         if (for_vacancy_id) {
             updationParts.push(`for_vacancy_id = ${for_vacancy_id}`);
         }
         if (first_name) {
-            updationParts.push(`first_name = ${first_name}`);
+            updationParts.push(`first_name = '${first_name}'`);
         }
         if (last_name) {
-            updationParts.push(`last_name = ${last_name}`);
+            updationParts.push(`last_name = '${last_name}'`);
         }
         if (surname) {
-            updationParts.push(`surname = ${surname}`);
+            updationParts.push(`surname = '${surname}'`);
         }
         if (interview_date) {
-            updationParts.push(`interview_date = ${interview_date}`);
+            updationParts.push(`interview_date = '${interview_date}'`);
         }
         if (requested_salary) {
             updationParts.push(`requested_salary = ${requested_salary}`);
@@ -85,16 +85,15 @@ class Candidate extends MainModel {
             updationParts.push(`exp_in_full_years = ${exp_in_full_years}`);
         }
 
-        const result = await sq.query(
+        const [_, meta] = await sq.query(
             `UPDATE candidates 
             SET ${updationParts.join(", ")} 
-            WHERE candidate_id = ${id}`, 
+            WHERE candidate_id = ${candidate_id}`, 
             { 
                 type: sq.QueryTypes.UPDATE 
             }
         );
-
-        return result;
+        return meta;
     }
 
     // Remove specific candidate by passed ID

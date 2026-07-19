@@ -41,6 +41,7 @@ import TableJobs from "assets/js/TableJobs.js"
 import { borderRadius, display, height, maxHeight, maxWidth, spacing, textAlign } from "@mui/system";
 import { position } from "stylis";
 import zIndex from "@mui/material/styles/zIndex";
+import tab from "assets/theme/components/tabs/tab";
 
 const modules = [AllCommunityModule];
 
@@ -58,8 +59,7 @@ function Tables() {
       return { flex: 1, minWidth: 100, sortable: false };
     }, []);
 
-    let purgeCacheOfVacancyTable;
-
+  
     const onGridReady = useCallback((params) => {
 
       const dataSource = {
@@ -138,12 +138,13 @@ function Tables() {
     tableJobs.setRowsOfCandidates = setCandidatesRowData;
     
     useEffect(() => {
+      
       // Get modals
       const addCandidateModal = document.getElementById("add-candidate-modal");
       const updateCandidateModal = document.getElementById("upd-candidate-modal");
       const removeCandidateModal = document.getElementById("remove-candidate-modal");
 
-      // Get all attributes of Candidate from modal
+      // Get all fields of modal for new Candidate 
       const candidateNameInpt = document.getElementById("modal-name-inpt");
       const candidateLastNameInpt = document.getElementById("modal-lastname-inpt");
       const candidateSurameInpt = document.getElementById("modal-surname-inpt");
@@ -152,6 +153,16 @@ function Tables() {
       const candidateSalaryInpt = document.getElementById("modal-salary-inpt");
       const candidateInterviewDateInpt = document.getElementById("modal-date-inpt");
       const candidteToRemoveIdInpt = document.getElementById("modal-rm-vID-inpt");
+
+      // Get all fields of modal for update Candidate
+      const candidateIDUpdateInpt = document.getElementById("modal-upd-cdID-inpt");
+      const candidateNameUpdateInpt = document.getElementById("modal-upd-name-inpt");
+      const candidateLastNameUpdateInpt = document.getElementById("modal-upd-lastname-inpt");
+      const candidateSurnameUpdateInpt = document.getElementById("modal-upd-surname-inpt");
+      const candidatevIDUpdateInpt = document.getElementById("modal-upd-vID-inpt");
+      const candidateExpUpdateInpt = document.getElementById("modal-upd-exp-inpt");
+      const candidateSalaryUpdateInpt = document.getElementById("modal-upd-salary-inpt");
+      const candidateInterviewDateUpdateInpt = document.getElementById("modal-upd-date-inpt");
       
       // Add candidate modal
       tableJobs.addCandidateModal = addCandidateModal;
@@ -160,7 +171,6 @@ function Tables() {
       // Remove candidate modal
       tableJobs.removeCandidateModal = removeCandidateModal;
       
-
       // Add new candidate fields
       tableJobs.candidateNameInpt = candidateNameInpt;
       tableJobs.candidateLastNameInpt = candidateLastNameInpt;
@@ -169,9 +179,21 @@ function Tables() {
       tableJobs.candidateExpInpt = candidateExpInpt;
       tableJobs.candidateSalaryInpt = candidateSalaryInpt;
       tableJobs.candidateInterviewDateInpt = candidateInterviewDateInpt;
+
+      // Update candidate fields 
+      tableJobs.candidateIDUpdateInpt = candidateIDUpdateInpt;
+      tableJobs.candidateNameUpdateInpt = candidateNameUpdateInpt;
+      tableJobs.candidateLastNameUpdateInpt = candidateLastNameUpdateInpt;
+      tableJobs.candidateSurnameUpdateInpt = candidateSurnameUpdateInpt;
+      tableJobs.candidatevIDUpdateInpt = candidatevIDUpdateInpt;
+      tableJobs.candidateExpUpdateInpt = candidateExpUpdateInpt;
+      tableJobs.candidateSalaryUpdateInpt = candidateSalaryUpdateInpt;
+      tableJobs.candidateInterviewDateUpdateInpt = candidateInterviewDateUpdateInpt;
       
       // Remove candidate ID field
       tableJobs.candidteToRemoveIdInpt = candidteToRemoveIdInpt;
+      // Load all candidates and vacancies when page is loaded
+      tableJobs.preloadDataFromServer();
     
     }, []);
     
@@ -192,7 +214,7 @@ function Tables() {
           <ArgonInput id="modal-date-inpt" type="date" placeholder="Дата собеседования"></ArgonInput>
           </div>
           <div style={{display: "flex", justifyContent: "center", marginTop: "10px"}}>
-            <ArgonButton variant='contained' size='small' color="success" onClick={ () => {console.log("Add!");} }>Добавить</ArgonButton>
+            <ArgonButton variant='contained' size='small' color="success" onClick={ () => { tableJobs.createNewCandidate(); } }>Добавить</ArgonButton>
             <ArgonButton style={{marginLeft: "10px"}} variant='contained' size='small' color="error" onClick={ () => { tableJobs.addCandidateModal.style.display = "none"; } }>Отмена</ArgonButton>
           </div>
         </div>
@@ -200,14 +222,14 @@ function Tables() {
         <div class="modal" id="upd-candidate-modal" style={{ display: "none", maxWidth: "450px", padding: "20px", background: "rgb(115 153 160)", borderRadius: "20px"}}>
           <h5 style={{textAlign: "center", marginTop: "20px", color: "white"}}>Изменить кандидата</h5>
           <div style={{display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "380px", padding: "20px 40px"}}>
-          <ArgonInput id="modal-cdID-inpt" type="number" placeholder="ID изменяемого кандидата"></ArgonInput>
-          <ArgonInput id="modal-name-inpt" placeholder="Имя"></ArgonInput>
-          <ArgonInput id="modal-lastname-inpt" placeholder="Фамилия"></ArgonInput>
-          <ArgonInput id="modal-surname-inpt" placeholder="Отчество"></ArgonInput>
-          <ArgonInput id="modal-vID-inpt" type="number" placeholder="ID вакансии (к какой вакансии)"></ArgonInput>
-          <ArgonInput id="modal-exp-inpt" type="number" min="0" placeholder="Опыт (полных лет)"></ArgonInput>
-          <ArgonInput id="modal-salary-inpt" type="number" step="0.01" min="0" placeholder="Желаемая З/П"></ArgonInput>
-          <ArgonInput id="modal-date-inpt" type="date" placeholder="Дата собеседования"></ArgonInput>
+          <ArgonInput id="modal-upd-cdID-inpt" type="number" placeholder="ID изменяемого кандидата"></ArgonInput>
+          <ArgonInput id="modal-upd-name-inpt" placeholder="Имя"></ArgonInput>
+          <ArgonInput id="modal-upd-lastname-inpt" placeholder="Фамилия"></ArgonInput>
+          <ArgonInput id="modal-upd-surname-inpt" placeholder="Отчество"></ArgonInput>
+          <ArgonInput id="modal-upd-vID-inpt" type="number" placeholder="ID вакансии (к какой вакансии)"></ArgonInput>
+          <ArgonInput id="modal-upd-exp-inpt" type="number" min="0" placeholder="Опыт (полных лет)"></ArgonInput>
+          <ArgonInput id="modal-upd-salary-inpt" type="number" step="0.01" min="0" placeholder="Желаемая З/П"></ArgonInput>
+          <ArgonInput id="modal-upd-date-inpt" type="date" placeholder="Дата собеседования"></ArgonInput>
           </div>
           <div style={{display: "flex", justifyContent: "center", marginTop: "10px"}}>
             <ArgonButton variant='contained' size='small' color="success" onClick={ () => { tableJobs.updateCandidate(); } }>Изменить</ArgonButton>

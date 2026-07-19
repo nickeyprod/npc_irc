@@ -59,9 +59,9 @@ router.post('/candidates/create', async (req, res) => {
 router.post('/candidates/update', async (req, res) => {
 	try {
 		// Process request in Candidates Controller
-		const stringifiedResult = cc.processCandidatesUpdateRequest(req);
-	
-		return res.send({ message: 'OK', newVacancy: stringifiedResult });
+		const numOfRowsAffected = await cc.processCandidatesUpdateRequest(req);
+		
+		return res.send({ message: 'OK', updatedCount: numOfRowsAffected });
 	}
 	catch(err) {
 		if (err instanceof RequestError) {

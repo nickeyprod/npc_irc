@@ -9,6 +9,7 @@ class TableJobs extends Network {
     setRowsOfCandidates;
     setRowsOfVacancies;
 
+    // Create new candidate inputs
     candidateNameInpt;
     candidateLastNameInpt;
     candidateSurameInpt;
@@ -17,13 +18,23 @@ class TableJobs extends Network {
     candidateSalaryInpt;
     candidateInterviewDateInpt;
 
+    // Update existing candidate inputs
+    candidateIDUpdateInpt;
+    candidateNameUpdateInpt;
+    candidateLastNameUpdateInpt;
+    candidateSurnameUpdateInpt;
+    candidatevIDUpdateInpt;
+    candidateExpUpdateInpt;
+    candidateSalaryUpdateInpt;
+    candidateInterviewDateUpdateInpt;
+
     candidteToRemoveIdInpt
      
     purgeCacheOfVacancyTable
 
     constructor() {
         super();
-        this.preloadDataFromServer();
+        // this.preloadDataFromServer();
     }
 
     async preloadDataFromServer() {
@@ -136,6 +147,8 @@ class TableJobs extends Network {
                 this.purgeCacheOfVacancyTable();
                 console.log("candidate creation success!");
                 window.alert("Новый кандидат успешно добавлен!");
+                // Hide modal after deleting
+                this.addCandidateModal.style.display = "none";
             } else {
                 console.log("error creating candidate!");
                 window.alert("Ошибка добавления нового кандидата! Попробуйте еще раз.");
@@ -156,6 +169,91 @@ class TableJobs extends Network {
 
     }
 
+    // Update existing candidate 
+    updateCandidate() {
+
+        const newDataForCandidate = {
+            candidate_id: this.candidateIDUpdateInpt.value,
+            name: this.candidateNameUpdateInpt.value,
+            last_name: this.candidateLastNameUpdateInpt.value,
+            surname: this.candidateSurnameUpdateInpt.value,
+            for_vacancy_id: this.candidatevIDUpdateInpt.value,
+            salary: this.candidateSalaryUpdateInpt.value,
+            exp_in_full_years: this.candidateExpUpdateInpt.value,
+            interview_date: this.candidateInterviewDateUpdateInpt.value
+        };
+
+        if (!newDataForCandidate.candidate_id) {
+            return window.alert("Вы не указали ID кандидата!");
+        }
+
+        let queryStr = `candidate_id=${newDataForCandidate.candidate_id}`;
+
+        let isOneFieldUpdated = false;
+
+        if (newDataForCandidate.name) {
+            queryStr += `&first_name=${newDataForCandidate.name}`;
+            isOneFieldUpdated = true;
+        }
+        if (newDataForCandidate.last_name) {
+            queryStr += `&last_name=${newDataForCandidate.last_name}`;
+            isOneFieldUpdated = true;
+        }
+        if (newDataForCandidate.surname) {
+            queryStr += `&surname=${newDataForCandidate.surname}`;
+            isOneFieldUpdated = true;
+        }
+        if (newDataForCandidate.for_vacancy_id) {
+            queryStr += `&for_vacancy_id=${newDataForCandidate.for_vacancy_id}`;
+            isOneFieldUpdated = true;
+        }
+        if (newDataForCandidate.salary) {
+           queryStr += `&requested_salary=${newDataForCandidate.salary}`;
+           isOneFieldUpdated = true;
+        }
+        if (newDataForCandidate.exp_in_full_years) {
+            queryStr += `&exp_in_full_years=${newDataForCandidate.exp_in_full_years}`;
+            isOneFieldUpdated = true;
+        }
+        if (newDataForCandidate.interview_date) {
+            queryStr += `&interview_date=${newDataForCandidate.interview_date}`;
+            isOneFieldUpdated = true;
+        }
+
+        if (!isOneFieldUpdated) {
+            return window.alert("Вы не обновляете ни одного поля! Заполните хотя бы одно поле кроме ID кандидата!");
+        }
+
+        const successFunc = (resp) => {
+            
+            let parsedData = JSON.parse(resp.responseText);
+            let {message, updatedCount} = parsedData;
+            if (message == "OK" && updatedCount == 1) {
+                // purge for updating
+                this.purgeCacheOfVacancyTable();
+                console.log("candidate updation success!");
+                window.alert("Кандидат успешно обновлен!");
+                // Hide modal after deleting
+                this.updateCandidateModal.style.display = "none";
+            } else {
+                console.log("error creating candidate!");
+                window.alert("Ошибка обновления полей кандидата! Попробуйте еще раз.");
+            }
+
+            // Update table here
+            this.getCandidates();
+        }
+
+        const errorFunc = (resp) => {
+            console.log("...:::Error Occured!:::...");
+            console.log("Ответ от сервера:", resp.response);
+            window.alert(`Ошибка обновдения полей кандидата! Попробуйте еще раз. Текст ошибки: ${resp.response}`);
+        }
+
+        this.sendAjax("/api/candidates/update", "POST", queryStr, successFunc, errorFunc);
+
+    }
+
     // Remove candidate by ID
     removeCandidate() {
         const id = this.candidteToRemoveIdInpt.value;
@@ -163,16 +261,20 @@ class TableJobs extends Network {
         if (!id) {
             return window.alert("Вы не указали ID кандидата!");
         }
-        console.log("rm: ID:", id);
+        console.log("removing candidate with ID:", id);
         const successFunc = (resp) => {
             
             let parsedData = JSON.parse(resp.responseText);
-            let {message, newCandidate} = parsedData;
+            let {message, _} = parsedData;
             if (message == "OK") {
                 // purge for updating
                 this.purgeCacheOfVacancyTable();
                 console.log("candidate deletion success!");
                 window.alert(`Кандидат с ID ${id} был удален!`);
+
+                // Hide modal after deleting
+                this.removeCandidateModal.style.display = "none";
+                
             } else {
                 console.log("error creating candidate!");
                 window.alert("Ошибка удаления кандидата! Попробуйте еще раз.");

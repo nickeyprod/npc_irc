@@ -48,14 +48,13 @@ class VacanciesController {
     }
     // Process request to POST /api/candidates/update
     async processCandidatesUpdateRequest(req) {
-        const { id, for_vacancy_id, first_name, last_name, surname, interview_date, requested_salary, exp_in_full_years } = req.body.data;
-        if (!id) {
-            throw new RequestError(400, 'Missing required body parameter "ID"');
+        const { candidate_id, for_vacancy_id, first_name, last_name, surname, interview_date, requested_salary, exp_in_full_years } = req.body;
+        if (!candidate_id) {
+            throw new RequestError(400, 'Missing required body parameter "candidate_id"');
         }
         // Update attributes of the candidate within RAW SQL QUERY
-        const result = await Candidate.updateSpecific(id, for_vacancy_id, first_name, last_name, surname, interview_date, requested_salary, exp_in_full_years);
-        const stringifiedResult = JSON.stringify(result);
-        return stringifiedResult;
+        const numOfRowsAffected = await Candidate.updateSpecific(candidate_id, for_vacancy_id, first_name, last_name, surname, interview_date, requested_salary, exp_in_full_years);
+        return numOfRowsAffected;
     }
     // Process request to POST /api/candidates/remove
     async processCandidatesRemoveRequest(req) {
